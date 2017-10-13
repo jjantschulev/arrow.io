@@ -1,0 +1,2 @@
+const WORLD_WIDTH = 1000;
+const WORLD_HEIGHT = 1000;
