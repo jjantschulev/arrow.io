@@ -17,7 +17,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(1200, 675);
+  createCanvas(windowWidth, windowHeight);
   player = new Player();
   cam = new Cam(player.pos);
 
