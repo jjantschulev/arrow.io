@@ -1,43 +1,54 @@
 var arrows = [];
 
-function Arrow(pos, dir, force) {
-  this.dir = dir;
-  this.pos = pos.copy();
+function showArrows() {
+  for (var i = arrows.length-1; i >= 0 ; i--) {
+    arrows[i].show();
+    arrows[i].update();
+  }
+}
+
+function Arrow(x, y, dir, force) {
+  this.pos = createVector(x, y);
   this.vel = p5.Vector.fromAngle(dir);
   this.vel.setMag(force);
-  this.w = 16;
-  this.h = this.w * 6.8654;
-  this.landed = false;
-  this.tipPos = pos.copy();
+  this.w = 7;
+  this.h = 60;
+  this.mass = 1;
+  this.landed = false
 }
 
 Arrow.prototype.show = function () {
+  imageMode(CENTER);
   push();
   translate(this.pos.x, this.pos.y);
-  rotate(this.dir + PI/2);
-  imageMode(CENTER);
+  rotate(this.vel.heading()+PI/2);
   if(this.landed){
-    // fill(0);
-    // noStroke();
-    // ellipse(0, 0, 10, 10);
-    image(arrowImage, 0, 0, this.w, this.h);
+    image(landedArrowImage, 0, 0, this.w, this.h/1.6);
   }else{
-    image(arrowImage, 0, 0, this.w, this.h);
+    image(arrowImage, 0, this.h/3, this.w, this.h);
   }
   pop();
 };
 
-Arrow.prototype.update = function () {
 
-  if (!this.landed) {
-    this.pos.add(this.vel);
-    this.tipPos.add(this.vel);
-    this.vel.mult(0.98);
-    this.tipPos.x = this.pos.x + this.h/2 * sin(this.dir + PI/2);
-    this.tipPos.y = this.pos.y - this.h/2 * cos(this.dir + PI/2);
+Arrow.prototype.update = function () {
+  for (var i = 0; i < boxes.length; i++) {
+    if(boxes[i].inside(this.pos.x, this.pos.y, 0, 0)){
+      this.landed = true;
+    }
   }
-  if(this.vel.mag() < 5){
-    this.landed = true;
-    this.vel.mult(0);
+  if(!this.landed){
+    this.vel.y += gravity/this.mass;
+    this.pos.add(this.vel);
+    this.vel.x *= (0.98);
+  }
+  if(this.pos.x < 0 || this.pos.x > WORLD_WIDTH){
+    arrows.splice(arrows.indexOf(this), 1);
+    return;
+  }
+  if(this.landed){
+    if(p5.Vector.dist(player.pos, this.pos) < 50){
+      arrows.splice(arrows.indexOf(this), 1);
+    }
   }
 };
